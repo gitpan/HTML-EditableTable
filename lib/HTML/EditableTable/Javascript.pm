@@ -11,15 +11,11 @@ HTML::EditableTable::Javascript
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $Version = '0.10';
-
-
-=head2 Class statics
-=cut
+our $Version = '0.11';
 
 my $javascriptDisplayCount = 0;
 
@@ -39,7 +35,7 @@ my %formElementTypeJavascriptMap = (
 
 =head1 SYNOPSIS
 
-This class provides all of the javascript functionality supported in EditableTable.  It is designed so that the javascript code used can be easily overridden with local .js files  See the documetation in HTML::EditableTable for guidance on extending this class.
+This class provides all of the javascript functionality supported in EditableTable.  It is designed so that the javascript code used can be easily overridden with local .js files  See the documetation in L<HTML::EditableTable> for guidance on extending this class.
 
 =cut
 
@@ -141,9 +137,6 @@ sub htmlDisplay {
     print $self->jsAddData();
   }
 }
-
-=head2 'Protected' Methods
-=cut
 
 sub jsExpandText {
 

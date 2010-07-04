@@ -12,11 +12,11 @@ HTML::EditableTable::Horizontal
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head2 'Protected' Virtual Methods
 
@@ -227,7 +227,7 @@ sub staticTableHeader {
 
 =head1 SYNOPSIS
 
-Implementation of EditableTable for the 'horizontal' case, where the first row presents the data header.  There are no public methods in this class.  See HTML::EditableTable for documentation.
+Implementation of EditableTable for the 'horizontal' case, where the first row presents the data header.  There are no public methods in this class.  See L<HTML::EditableTable> for documentation.
 
 =head1 COPYRIGHT & LICENSE
 

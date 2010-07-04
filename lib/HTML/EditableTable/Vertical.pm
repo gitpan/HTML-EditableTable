@@ -12,15 +12,15 @@ HTML::EditableTable::Vertical
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
-Implementation of the EditableTable class for the construction of 'Vertical' Tables, where the first column of the table presents the header. See HTML::EditableTable for documentation.
+Implementation of the EditableTable class for the construction of 'Vertical' Tables, where the first column of the table presents the header. See L<HTML::EditableTable> for documentation.
 
 =cut
 
