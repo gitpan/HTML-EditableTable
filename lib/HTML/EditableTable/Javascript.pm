@@ -11,11 +11,11 @@ HTML::EditableTable::Javascript
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $Version = '0.11';
+our $Version = '0.12';
 
 my $javascriptDisplayCount = 0;
 

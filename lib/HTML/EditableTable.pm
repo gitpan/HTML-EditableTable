@@ -15,11 +15,11 @@ HTML::EditableTable - Classes for html presentation of tabular data with view an
 
 =head1 VERSION
 
-Version 0.11
+Version 0.12
 
 =cut
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 =head1 SYNOPSIS
 
@@ -196,33 +196,17 @@ our $VERSION = '0.11';
 
 This module was developed to simplify the manipuation of complex tabular data in engineering and business-process web applications.  The motivation was a rapid-prototype software development flow where the requirements gathering phase goes something like "I have this big complicated spreadsheet that I want to make a website out of..., can you help?".  The EditableTable class is an 'abstract' base class and EditableTable::Horizontal and EditableTable::Vertical are the implementations for two commonly used table types.  Key features of these classes are as follows:
 
-=over
+- toggling of the table between view and edit modes with support for common html widgets
 
-=item * 
+- uniquification of form element data to support processing of html form submissions of table data
 
-toggling of the table between view and edit modes with support for common html widgets
+- support for rowspanning
 
-=item * 
+- methods to generate javascript for dynamic addition and remove of rows and commonly needed features such as 'click-to-expand' text display, calendar widget date entry, and sorting
 
-uniquification of form element data to support processing of html form submissions of table data
-
-=item * 
-
-support for rowspanning
-
-=item * 
-
-methods to generate javascript for dynamic addition and remove of rows and commonly needed features such as 'click-to-expand' text display, calendar widget date entry, and sorting
-
-=item * 
-
-support for callbacks when data need to be pre-processed prior to display
-
-=back
+- support for callbacks when data need to be pre-processed prior to display
 
 For the Horizontal table, data are provided to tables in an array-of-hashes (most common case) or a hash-of-hashes.  For the Vertical table, a single hash of data produces a single column of data while a hash-of-hashes supports muliple data columns.
-
-
 
 =head1 TABLE METHODS AND PARAMETERS
 
@@ -498,7 +482,7 @@ array of hashrefs (most common for Horizontal Table)
     ]
  )
 
-a hashref of hashrefs - this allows sorting the rows by hash key.  This structure is allowable for EditableTable::Horizontal and multi-column Editable::Vertical.  See SORTING for details.
+a hashref of hashrefs - this allows sorting the rows by hash key.  This structure is allowable for EditableTable::Horizontal and multi-column Editable::Vertical.  See L</"SORTING"> for details.
 
  $table->setData(
     {
@@ -619,7 +603,7 @@ sub setEditMode {
 
 =head2 setSortHeader (public)
 
-Set a base url for server-side sorting.  See SORTING for details on the sorting options for EditableTable.
+Set a base url for server-side sorting.  See </"SORTING"> for details on the sorting options for EditableTable.
 
  $table->setSortHeader("http://yoururl.com?session=ruggs98888&");
 
@@ -656,7 +640,7 @@ sub setSortData {
 
 =head2 setJsSortHeader (public)
 
-When set, implements javascript for client-side table sorting.  See SORTING for details on EditableTable sorting.
+When set, implements javascript for client-side table sorting.  See </"SORTING"> for details on EditableTable sorting.
 
  $table->setSortData(1)
 
@@ -792,7 +776,7 @@ sub setStyle {
   
 =head2 setJsAddData (public)
 
-For Horizontal tables.  Use to activate javascript to support addition of new table rows.  See JAVASCRIPT INTEGRATION for details.
+For Horizontal tables.  Use to activate javascript to support addition of new table rows.  See L</"JAVASCRIPT INTEGRATION"> for details.
 
  $table->setJsAddData(1);
 
@@ -1076,7 +1060,7 @@ sub unshiftField {
 
 =head2 setJavascript (public)
 
-This method can be used to override the default javascript object.  Inherit from HTML::EditableTable::Javascript and provide an object reference to your table prior to calling htmlJavascriptDisplay().  If this method is not used, the default class will be used to create a javascript object.  See JAVASCRIPT INTEGRATION for more details.
+This method can be used to override the default javascript object.  Inherit from HTML::EditableTable::Javascript and provide an object reference to your table prior to calling htmlJavascriptDisplay().  If this method is not used, the default class will be used to create a javascript object.  See L<"/JAVASCRIPT INTEGRATION"> for more details.
 
  my $javascript = MyJavascript->new();
  $table->setJavascript($javascript);
@@ -1810,7 +1794,7 @@ formElement specifies the html input field that will be used when the table is i
 
 =item *
 
-calendar - Implements popup calendar using www.dynarch.com jscalendar 1.0.  Requires this javascript library to be accessible.  See JAVASCRIPT INTEGRATION for details.
+calendar - Implements popup calendar using www.dynarch.com jscalendar 1.0.  Requires this javascript library to be accessible.  See L</"JAVASCRIPT INTEGRATION"> for details.
 
 =item *
 
@@ -1991,7 +1975,7 @@ For a textfield input tag, sets the maximum number of characters which can be in
 
 =head2 tooltip (occasional)
 
-Implements javascript to provide mouseover tooltips.  The value sets the text to be displayed.  See the JAVASCRIPT INTEGRATION section for details.
+Implements javascript to provide mouseover tooltips.  The value sets the text to be displayed.  See the </"JAVASCRIPT INTEGRATION"> section for details.
 
  'tooltip' => 'The master PDM part number'
 
@@ -2298,7 +2282,7 @@ The functionality provided through javascript are described below:
 
 =head2 Table Sorting
 
-Client-side table sorting is implemented using Stuart Langridge's SortTable Version 2: http://www.kryogenix.org/code/browser/sorttable/  See SORTING for more details on this and other table sorting options.  To use this feature set the 'jsSortHeader' table level parameter:
+Client-side table sorting is implemented using Stuart Langridge's SortTable Version 2: http://www.kryogenix.org/code/browser/sorttable/  See L</"SORTING"> for more details on this and other table sorting options.  To use this feature set the 'jsSortHeader' table level parameter:
 
  $table->setJsSortHeader(1);
 
@@ -2427,29 +2411,15 @@ There are several examples provided in the 'example' directory in the module dis
 
 This code is provided courtesy of Freescale Semicondutor.  The developers are
 
-=over
-
-=item 
-
 Andy Espenscheid C<< <espenshovel@gmail.com> >>
-
-=item 
 
 Sergei Kondratiev
 
-=item 
-
 Vishesh Kumar
-
-=item 
 
 Vijay Yadav
 
-=item
-
 Mike Boatright
-
-=back
 
 =head1 BUGS & POTENTIAL ISSUES
 
