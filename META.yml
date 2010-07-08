@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                HTML-EditableTable
-version:             0.12
+version:             0.20
 abstract:            Classes for html presentation of tabular data with view and edit modes.
 license:             perl
 author:              

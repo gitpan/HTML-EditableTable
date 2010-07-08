@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 10;
+use Test::More tests => 14;
 
 my @exampleScripts = (
   "example_1.cgi",
@@ -10,6 +10,8 @@ my @exampleScripts = (
   "example_3.cgi",
   "example_4.cgi",
   "example_5.cgi",
+  "example_6.cgi",
+  "example_7.cgi",
     );
   
 # view mode

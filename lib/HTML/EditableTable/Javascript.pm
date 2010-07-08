@@ -11,11 +11,11 @@ HTML::EditableTable::Javascript
 
 =head1 VERSION
 
-Version 0.12
+Version 0.20
 
 =cut
 
-our $Version = '0.12';
+our $Version = '0.20';
 
 my $javascriptDisplayCount = 0;
 
@@ -65,12 +65,6 @@ sub htmlDisplay {
 
   my $self = shift;
 
-  # calendar stuff if dynarch calendar support is called for
-
-#  if (!$javascriptDisplayCount && $self->{flags}{jsCalendarSetup}) {
-#    print $self->jsCalendarSetup();
-#  }
-  
   # for multiple table case, only print these once
 
   if (!$javascriptDisplayCount) {
@@ -348,9 +342,9 @@ sorttable = {
 	          row_array[row_array.length] = [sorttable.getInnerText(rows[j].cells[col]), rows[j]];
 	        }
 	        /* If you want a stable sort, uncomment the following line */
-	        //sorttable.shaker_sort(row_array, this.sorttable_sortfunction);
+	        sorttable.shaker_sort(row_array, this.sorttable_sortfunction);
 	        /* and comment out this one */
-	        row_array.sort(this.sorttable_sortfunction);
+	        // row_array.sort(this.sorttable_sortfunction);
 	        
 	        tb = this.sorttable_tbody;
 	        for (var j=0; j<row_array.length; j++) {

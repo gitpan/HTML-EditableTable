@@ -15,11 +15,11 @@ HTML::EditableTable - Classes for html presentation of tabular data with view an
 
 =head1 VERSION
 
-Version 0.12
+Version 0.20
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.20';
 
 =head1 SYNOPSIS
 
@@ -315,6 +315,9 @@ sub new {
     # table field parameter validation is on by default
     $self->{validateTableFieldKeys} = 1;
 
+    # flag set when stdout is rerouted to avoid multiple acts of this
+    $self->{stdoutRerouted} = 0;
+    
     my $initData = shift @_;
 
     bless $self, $class;
@@ -361,6 +364,8 @@ sub initialize {
     if (exists $initData->{'calendarDir'}) {$self->setCalendarDir($initData->{'calendarDir'}); delete $initData->{'calendarDir'}; }
     if (exists $initData->{'validateTableFieldKeys'}) {$self->setValidateTableFieldKeys($initData->{'validateTableFieldKeys'}); delete $initData->{'validateTableFieldKeys'}; }
 
+    if (exists $initData->{'stringOutput'}) { $self->setStringOutput($initData->{'stringOutput'}); delete $initData->{'stringOutput'}; }
+
     my @remainingInitKeys = keys %$initData;
     
     if (scalar(@remainingInitKeys)) {
@@ -397,7 +402,7 @@ sub setValidateTableFieldKeys {
 
 =head2 isvalidTableFieldKey (private)
 
-Called for each field-level key parameer is validateTableFieldKeys is enabled (the default).
+Called for each field-level key parameer if validateTableFieldKeys is enabled (the default).
 
 =cut
 
@@ -530,7 +535,7 @@ sub getData {
 
 =head2 getTableFields (public)
 
-Required parameter.  An arrayref of hashrefs to parameters for each table field.  Fields are presented left-to-right in array order for Horizontal tables and top-to-bottom for Vertical Tables.  See the TABLE FIELD PARAMETERS for documentation of the field parameters.
+Required parameter.  An arrayref of hashrefs to parameters for each table field.  Fields are presented left-to-right in array order for Horizontal tables and top-to-bottom for Vertical Tables.  See L</"TABLE FIELD PARAMETERS"> for documentation of the field parameters.
 
  $table->setTableFields (
    [
@@ -601,9 +606,27 @@ sub setEditMode {
     $self->{'editMode'} = $editMode;
 }
 
+=head2 setStringOutput (public)
+
+By default, EditableTable's htmlDisplay and htmlJavascriptDisplay method will output to STDOUT.  If stringOutput is set to 1 or 'true', then htmlDisplay will return a string with the table html.
+
+ $table->setStringOutput(1);
+ my $tableHtml = $table->htmlDisplay();
+
+=cut
+
+sub setStringOutput {
+
+   my $self = shift @_;
+   my $stringOutput = shift @_;
+   if ($stringOutput !~ /^1|true|0|false$/) { confess "noheader is a flag which must be set to 1 or 'true'"; }
+   if ($stringOutput eq 'false') { $stringOutput = 0; }
+   $self->{'stringOutput'} = $stringOutput;
+}
+
 =head2 setSortHeader (public)
 
-Set a base url for server-side sorting.  See </"SORTING"> for details on the sorting options for EditableTable.
+Set a base url for server-side sorting.  See L</"SORTING"> for details on the sorting options for EditableTable.
 
  $table->setSortHeader("http://yoururl.com?session=ruggs98888&");
 
@@ -640,7 +663,7 @@ sub setSortData {
 
 =head2 setJsSortHeader (public)
 
-When set, implements javascript for client-side table sorting.  See </"SORTING"> for details on EditableTable sorting.
+When set, implements javascript for client-side table sorting.  See L</"SORTING"> for details on EditableTable sorting.
 
  $table->setSortData(1)
 
@@ -893,7 +916,7 @@ sub setSuppressUndefinedFields {
 
 =head2 getCalendarDir (public)
 
-Returns the directory for installation of www.dynarch,cin jscalendar-1.0, which is supported in the 'calendar' formElement.  Defaults to 'jscalendar'  if not set.
+Returns the directory for installation of www.dynarch.com jscalendar-1.0, which is supported in the 'calendar' formElement.  Defaults to 'jscalendar'  if not set.
  
  $self->getCalendarDir();
 
@@ -906,7 +929,7 @@ sub getCalendarDir {
 
 =head2 setCalendarDir (public)
 
-Directory for installation of www.dynarch,cin jscalendar-1.0, which is supported in the 'calendar' formElement.  Defaults to 'jscalendar'  if not set.
+Directory for installation of www.dynarch.com jscalendar-1.0, which is supported in the 'calendar' formElement.  Defaults to 'jscalendar'  if not set.
  
  $self->setCalendarDir('jscal_10');
 
@@ -930,10 +953,24 @@ sub htmlDisplay {
 
     my $self = shift @_;
 
+    # re-route STDOUT to string if called for
+    
+    my $stdout = undef;
+
+    if ($self->{stringOutput} && !$self->{stdoutRerouted}) {
+
+      open(TMPOUT, '>&', \*STDOUT) || confess "failed to save STDOUT";
+      close STDOUT;
+      open(STDOUT, '>', \$stdout) || confess "failed to reroute STDOUT to string";
+      
+      # set flag nested calls don't redo this
+      $self->{stdoutRerouted} = 1;
+    }
+    
     # if the javascript display method has not been called, call it now
 
     if (!$self->{javascriptDisplayed}) {
-      $self->htmlJavascriptDisplay();
+	$self->htmlJavascriptDisplay();
     }
 
     # ensure we have all the required parameters populated before attempting to create the table html
@@ -945,7 +982,7 @@ sub htmlDisplay {
     # print a hidden template row if the jsAddData feature is being used
 
     if ($self->{jsAddData}) {
-      $self->htmlAddDataSetup();
+	$self->htmlAddDataSetup();
     }
 
      # sort the data server-side if this option is used
@@ -966,6 +1003,16 @@ sub htmlDisplay {
     # virtual method which must be inherited for core table drawing
 
     $self->makeTable();
+
+    # if stdout rerouted
+     if ($self->{stringOutput}) {
+      open STDOUT, '>&', \*TMPOUT;
+      close TMPOUT;
+
+      $self->{stdoutRerouted} = 0;
+
+      return $stdout;
+    }
 }
 
 =head2 removeField (public)
@@ -1060,7 +1107,7 @@ sub unshiftField {
 
 =head2 setJavascript (public)
 
-This method can be used to override the default javascript object.  Inherit from HTML::EditableTable::Javascript and provide an object reference to your table prior to calling htmlJavascriptDisplay().  If this method is not used, the default class will be used to create a javascript object.  See L<"/JAVASCRIPT INTEGRATION"> for more details.
+This method can be used to override the default javascript object.  Inherit from HTML::EditableTable::Javascript and provide an object reference to your table prior to calling htmlJavascriptDisplay().  If this method is not used, the default class will be used to create a javascript object.  See L</"JAVASCRIPT INTEGRATION"> for more details.
 
  my $javascript = MyJavascript->new();
  $table->setJavascript($javascript);
@@ -1088,6 +1135,19 @@ sub htmlJavascriptDisplay {
 
   my $self = shift;
 
+  # re-route STDOUT if called for
+  my $stdout = undef;
+
+  if ($self->{stringOutput} && !$self->{stdoutRerouted}) {
+    
+    open(TMPOUT, '>&', \*STDOUT) || confess "failed to save STDOUT";
+    close STDOUT;
+    open(STDOUT, '>', \$stdout) || confess "failed to reroute STDOUT to string";
+      
+    # set flag nested calls don't redo this
+    $self->{stdoutRerouted} = 1;
+  }
+
   # block repeated printing of javascript
   if (!$self->{javascriptDisplayed}) {
   
@@ -1100,6 +1160,17 @@ sub htmlJavascriptDisplay {
   }
 
   $self->{javascriptDisplayed} = 1;
+
+  # if stdout re-routed  
+  if ($self->{stringOutput}) {
+    open STDOUT, '>&', \*TMPOUT;
+    close TMPOUT;
+    
+    $self->{stdoutRerouted} = 0;
+    
+      return $stdout;
+  }
+  
 }
 
 =head2 htmlAddDataSetup (private)
@@ -1975,7 +2046,7 @@ For a textfield input tag, sets the maximum number of characters which can be in
 
 =head2 tooltip (occasional)
 
-Implements javascript to provide mouseover tooltips.  The value sets the text to be displayed.  See the </"JAVASCRIPT INTEGRATION"> section for details.
+Implements javascript to provide mouseover tooltips.  The value sets the text to be displayed.  See the L</"JAVASCRIPT INTEGRATION"> section for details.
 
  'tooltip' => 'The master PDM part number'
 
