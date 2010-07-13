@@ -11,11 +11,11 @@ HTML::EditableTable::Javascript
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $Version = '0.20';
+our $Version = '0.21';
 
 my $javascriptDisplayCount = 0;
 
@@ -66,6 +66,8 @@ sub htmlDisplay {
   my $self = shift;
 
   # for multiple table case, only print these once
+
+  print "debug displayCount = $javascriptDisplayCount<br>";
 
   if (!$javascriptDisplayCount) {
 
@@ -130,6 +132,13 @@ sub htmlDisplay {
   if ($self->{parent}->isParamSet('jsAddData')) {
     print $self->jsAddData();
   }
+}
+
+sub resetJavascriptDisplayCount {
+  my $self = shift;
+  
+  print "reseting display count<br>";
+  $javascriptDisplayCount = 0;
 }
 
 sub jsExpandText {

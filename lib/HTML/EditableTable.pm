@@ -5,8 +5,6 @@ use strict;
 use Carp qw(confess);
 use CGI qw(:standard);
 
-#use lib './';
-
 use HTML::EditableTable::Javascript;
 
 =head1 NAME
@@ -15,11 +13,11 @@ HTML::EditableTable - Classes for html presentation of tabular data with view an
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
@@ -341,31 +339,27 @@ sub initialize {
     my $self = shift @_;
     my $initData = shift @_;
 
-    if (exists $initData->{'data'}) { $self->setData($initData->{'data'}); delete $initData->{'data'}; }
-    if (exists $initData->{'tableFields'}) { $self->setTableFields($initData->{'tableFields'}); delete $initData->{'tableFields'}; }
-    if (exists $initData->{'editMode'}) { $self->setEditMode($initData->{'editMode'}); delete $initData->{'editMode'}; }
-    if (exists $initData->{'sortHeader'}) { $self->setSortHeader($initData->{'sortHeader'}); delete $initData->{'sortHeader'}; }
-    if (exists $initData->{'jsSortHeader'}) { $self->setJsSortHeader($initData->{'jsSortHeader'}); delete $initData->{'jsSortHeader'}; }
-    if (exists $initData->{'sortData'}) { $self->setSortData($initData->{'sortData'}); delete $initData->{'sortData'}; }
-
-    if (exists $initData->{'tabindex'}) { $self->setTabindex($initData->{'tabindex'}); delete $initData->{'tabindex'}; }
-    if (exists $initData->{'title'}) { $self->setTitle($initData->{'title'}); delete $initData->{'title'}; }
-    if (exists $initData->{'tableId'}) { $self->setTableId($initData->{'tableId'}); delete $initData->{'tableId'}; }
+    if (exists $initData->{'data'}) { $self->setData(delete $initData->{'data'});  }
+    if (exists $initData->{'tableFields'}) { $self->setTableFields(delete $initData->{'tableFields'}); }
+    if (exists $initData->{'editMode'}) { $self->setEditMode(delete $initData->{'editMode'}); }
+    if (exists $initData->{'sortHeader'}) { $self->setSortHeader(delete $initData->{'sortHeader'}); }
+    if (exists $initData->{'jsSortHeader'}) { $self->setJsSortHeader(delete $initData->{'jsSortHeader'}); }
+    if (exists $initData->{'sortData'}) { $self->setSortData(delete $initData->{'sortData'}); }
+    if (exists $initData->{'tabindex'}) { $self->setTabindex(delete $initData->{'tabindex'}); }
+    if (exists $initData->{'title'}) { $self->setTitle(delete $initData->{'title'}); }
+    if (exists $initData->{'tableId'}) { $self->setTableId(delete $initData->{'tableId'}); }
+    if (exists $initData->{'width'}) { $self->setWidth(delete $initData->{'width'}); }
+    if (exists $initData->{'style'}) { $self->setStyle(delete $initData->{'style'}); }
+    if (exists $initData->{'jsAddData'}) { $self->setJsAddData(delete $initData->{'jsAddData'}); }
+    if (exists $initData->{'noheader'}) { $self->setNoheader(delete $initData->{'noheader'}); }
+    if (exists $initData->{'rowspannedEdit'}) { $self->setRowspannedEdit(delete $initData->{'rowspannedEdit'}); }
+    if (exists $initData->{'sortOrder'}) { $self->setSortOrder(delete $initData->{'sortOrder'}); }
+    if (exists $initData->{'border'}) { $self->setBorder(delete $initData->{'border'}); }
+    if (exists $initData->{'suppressUndefinedFields'}) {$self->setSuppressUndefinedFields(delete $initData->{'setSuppressUndefinedFields'}); }
+    if (exists $initData->{'calendarDir'}) {$self->setCalendarDir(delete $initData->{'calendarDir'}); }
+    if (exists $initData->{'validateTableFieldKeys'}) {$self->setValidateTableFieldKeys(delete $initData->{'validateTableFieldKeys'}); }
+    if (exists $initData->{'stringOutput'}) { $self->setStringOutput(delete $initData->{'stringOutput'}); }
     
-
-    if (exists $initData->{'width'}) { $self->setWidth($initData->{'width'}); delete $initData->{'width'}; }
-    if (exists $initData->{'style'}) { $self->setStyle($initData->{'style'}); delete $initData->{'style'}; }
-    if (exists $initData->{'jsAddData'}) { $self->setJsAddData($initData->{'jsAddData'}); delete $initData->{'jsAddData'}; }
-    if (exists $initData->{'noheader'}) { $self->setNoheader($initData->{'noheader'}); delete $initData->{'noheader'}; }
-    if (exists $initData->{'rowspannedEdit'}) { $self->setRowspannedEdit($initData->{'rowspannedEdit'}); delete $initData->{'rowspannedEdit'}; }
-    if (exists $initData->{'sortOrder'}) { $self->setSortOrder($initData->{'sortOrder'}); delete $initData->{'sortOrder'}; }
-    if (exists $initData->{'border'}) { $self->setBorder($initData->{'border'}); delete $initData->{'border'}; }
-    if (exists $initData->{'suppressUndefinedFields'}) {$self->setSuppressUndefinedFields($initData->{'setSuppressUndefinedFields'}); delete $initData->{'setSuppressUndefinedFields'}; }
-    if (exists $initData->{'calendarDir'}) {$self->setCalendarDir($initData->{'calendarDir'}); delete $initData->{'calendarDir'}; }
-    if (exists $initData->{'validateTableFieldKeys'}) {$self->setValidateTableFieldKeys($initData->{'validateTableFieldKeys'}); delete $initData->{'validateTableFieldKeys'}; }
-
-    if (exists $initData->{'stringOutput'}) { $self->setStringOutput($initData->{'stringOutput'}); delete $initData->{'stringOutput'}; }
-
     my @remainingInitKeys = keys %$initData;
     
     if (scalar(@remainingInitKeys)) {
@@ -394,10 +388,7 @@ Toggles validation of field-level parameters.  Enabled by default.  Disable only
 sub setValidateTableFieldKeys {
   my $self = shift;
   my $val = shift;
-  
-  if ($val != 1 || $val != 0) { confess "$val is not a valid value"; }
-  
-  $self->{validateTableFieldKeys} = $val;
+  $self->{validateTableFieldKeys} = $self->checkBool($val);
 }
 
 =head2 isvalidTableFieldKey (private)
@@ -533,7 +524,7 @@ sub getData {
     return $self->{'data'};
 }
 
-=head2 getTableFields (public)
+=head2 setTableFields (public)
 
 Required parameter.  An arrayref of hashrefs to parameters for each table field.  Fields are presented left-to-right in array order for Horizontal tables and top-to-bottom for Vertical Tables.  See L</"TABLE FIELD PARAMETERS"> for documentation of the field parameters.
 
@@ -616,12 +607,9 @@ By default, EditableTable's htmlDisplay and htmlJavascriptDisplay method will ou
 =cut
 
 sub setStringOutput {
-
    my $self = shift @_;
-   my $stringOutput = shift @_;
-   if ($stringOutput !~ /^1|true|0|false$/) { confess "noheader is a flag which must be set to 1 or 'true'"; }
-   if ($stringOutput eq 'false') { $stringOutput = 0; }
-   $self->{'stringOutput'} = $stringOutput;
+   my $val = shift @_;
+   $self->{'stringOutput'} = $self->checkBool($val);
 }
 
 =head2 setSortHeader (public)
@@ -656,9 +644,7 @@ When set, EditableTable will sort the $self->{data} server-side.  Often this is 
 sub setSortData {
   my $self = shift @_;
   my $sortData = shift @_;
-  
-  if ($sortData !~ /1|(true)/) { confess "sortData is a flag which must be set to 1 or 'true' - current value is ($sortData)"; }   
-  $self->{'sortData'} = $sortData;   
+  $self->{'sortData'} = $self->checkBool($sortData);   
 }
 
 =head2 setJsSortHeader (public)
@@ -674,9 +660,7 @@ When set, implements javascript for client-side table sorting.  See L</"SORTING"
 sub setJsSortHeader {
     my $self = shift @_;
     my $jsSortHeader = shift @_;
-    
-    if ($jsSortHeader !~ /1|(true)/) { confess "jsSortHeader is a flag which must be set to 1 or 'true' - current value is ($jsSortHeader)"; }   
-    $self->{'jsSortHeader'} = $jsSortHeader;    
+    $self->{'jsSortHeader'} = $self->checkBool($jsSortHeader);    
 }
 
 =head2 setTabindex (public)
@@ -714,39 +698,6 @@ sub setTitle {
     if (ref($title)) { confess "the title is a string with the table title"; }
     $self->{'title'} = $title;
 }
-
-# #initial order by
-
-# sub setInitialOrderBy{
-#     my $self = shift @_;
-#     my $order = shift @_;
-#     if (ref($order)) { confess "the order is a string"; }
-#     $self->{'initialOrderBy'} = $order;
-
-# }
-
-# #initial order direction
-
-# sub setInitialOrderDirection{
-#     my $self = shift @_;
-#     my $order = shift @_;
-#     if (ref($order)) { confess "the order is a string"; }
-#     $self->{'initialOrderDirection'} = $order;
-
-
-# }
-
-# for vertical tables, this is ref to an array of hash keys defining the column order
-
-# setSortOrder has replaced this one
-
-# sub setHeadingOrder {
-#     my $self = shift @_;
-#     my $headingOrder = shift @_;
-#     if (ref($headingOrder ne 'ARRAY')) { confess "the heading order must be a reference to an array of the column names"; }
-
-#     $self->{'headingOrder'} = $headingOrder;
-# }
 
 # table width
 
@@ -810,8 +761,7 @@ For Horizontal tables.  Use to activate javascript to support addition of new ta
 sub setJsAddData {
    my $self = shift @_;
    my $jsAddData = shift @_;
-   if ($jsAddData !~ /1|(true)/) { confess "jsAddData is a flag which must be set to 1 or 'true' - current value is ($jsAddData)"; }
-   $self->{'jsAddData'} = $jsAddData;
+   $self->{'jsAddData'} = $self->checkBool($jsAddData);
 }
 
 =head2 setNoHeader (public)
@@ -828,38 +778,8 @@ sub setNoHeader {
 
    my $self = shift @_;
    my $noheader = shift @_;
-   if ($noheader !~ /1|(true)/) { confess "noheader is a flag which must be set to 1 or 'true'"; }
-   $self->{'noheader'} = $noheader;
+   $self->{'noheader'} = $self->checkBool($noheader);
 }
-
-# =head2 setRowspanDriver (public)
-
-# For Horizontal tables using rowwspanning. Sets the table field hashref 'dbfield' key which triggers rowspanning in the table.
-
-#  $table->setRowspanDriver('tools')
-
-# =cut
-
-# # horzontal tables: indicates field that contains an array of data which triggers a rowspanning on the table
-
-# sub setRowspanDriver {
-
-#     my $self = shift @_;
-#     my $rowspanDriver = shift @_;
-#     if (ref($rowspanDriver)) { confess "the rowspanDriver is a string with the table rowspanDriver"; }
-#     $self->{'rowspanDriver'} = $rowspanDriver;
-# }
-
-# # horzontal tables: indicates field that contains an array of data which triggers a rowspanning on the table
-# # the max count in any row is evaluated
-
-# sub setVariableRowspanDriver {
-
-#     my $self = shift @_;
-#     my $variableRowspanDriver = shift @_;
-#     if (ref($variableRowspanDriver) ne 'ARRAY') { confess "the variableRowspanDriver needs to be an array ref"; }
-#     $self->{'variableRowspanDriver'} = $variableRowspanDriver;
-# }
 
 =head2 setRowspannedEdit (public)
 
@@ -873,8 +793,7 @@ sub setRowspannedEdit {
 
    my $self = shift @_;
    my $rowspannedEdit = shift @_;
-   if ($rowspannedEdit !~ /1|true/) { confess "rowspannedEdit is a flag which must be set to 1 or 'true'"; }
-   $self->{'rowspannedEdit'} = $rowspannedEdit;
+   $self->{'rowspannedEdit'} = $self->checkBool($rowspannedEdit);
 
 }
 
@@ -910,8 +829,7 @@ For Vertical tables.  Avoids displaying a row if the data value for that row is 
 sub setSuppressUndefinedFields {
     my $self = shift @_;
     my $suppressUndefinedFields = shift @_;
-    if ($suppressUndefinedFields !~ /1|true/) { confess "suppressUndefinedFields is a flag which must be set to 1 or 'true'"; }
-    $self->{'suppressUndefinedFields'} = $suppressUndefinedFields;
+    $self->{'suppressUndefinedFields'} = $self->checkBool($suppressUndefinedFields);
 }
 
 =head2 getCalendarDir (public)
@@ -967,11 +885,9 @@ sub htmlDisplay {
       $self->{stdoutRerouted} = 1;
     }
     
-    # if the javascript display method has not been called, call it now
+    # display javascript - this method will return immediately if the javascriptDispalyed flag is set.
 
-    if (!$self->{javascriptDisplayed}) {
-	$self->htmlJavascriptDisplay();
-    }
+    $self->htmlJavascriptDisplay();
 
     # ensure we have all the required parameters populated before attempting to create the table html
 
@@ -1135,47 +1051,81 @@ sub htmlJavascriptDisplay {
 
   my $self = shift;
 
-  # re-route STDOUT if called for
-  my $stdout = undef;
-
-  if ($self->{stringOutput} && !$self->{stdoutRerouted}) {
-    
-    open(TMPOUT, '>&', \*STDOUT) || confess "failed to save STDOUT";
-    close STDOUT;
-    open(STDOUT, '>', \$stdout) || confess "failed to reroute STDOUT to string";
-      
-    # set flag nested calls don't redo this
-    $self->{stdoutRerouted} = 1;
-  }
-
   # block repeated printing of javascript
   if (!$self->{javascriptDisplayed}) {
-  
+      
+    # re-route STDOUT if called for
+    my $stdout = undef;
+    
+    if ($self->{stringOutput} && !$self->{stdoutRerouted}) {
+      
+      open(TMPOUT, '>&', \*STDOUT) || confess "failed to save STDOUT";
+      close STDOUT;
+      open(STDOUT, '>', \$stdout) || confess "failed to reroute STDOUT to string";
+      
+      # set flag nested calls don't redo this
+      $self->{stdoutRerouted} = 1;
+    }
+     
     # create a javascript object if one has not been provided by the user
     if (!$self->{javascript}) { 
       $self->{javascript} = HTML::EditableTable::Javascript->new($self);
     }
+          
+    $self->{javascript}->htmlDisplay();       
+    $self->{javascriptDisplayed} = 1;
     
-    $self->{javascript}->htmlDisplay();    
-  }
-
-  $self->{javascriptDisplayed} = 1;
-
-  # if stdout re-routed  
-  if ($self->{stringOutput}) {
-    open STDOUT, '>&', \*TMPOUT;
-    close TMPOUT;
-    
-    $self->{stdoutRerouted} = 0;
+    # if stdout re-routed  
+    if ($self->{stringOutput}) {
+      open STDOUT, '>&', \*TMPOUT;
+      close TMPOUT;
+      
+      $self->{stdoutRerouted} = 0;
     
       return $stdout;
+    }
+  }
+}  
+
+=head2 resetJavascriptDisplayed (public) {
+
+Resets both the table javascriptDisplayed and Javascript javascriptDisplayCount flag to 0.  Use when you have a persistent server and blow away an html document with the generated code.
+
+ $table->resetJavascriptDisplayed();
+
+=cut
+
+sub resetJavascriptDisplayed {
+
+  my $self = shift @_;
+
+  if ($self->{javascript}) {
+    $self->{javascript}->resetJavascriptDisplayCount();
   }
   
+  $self->{javacriptDisplayed} = 0;
 }
 
+=head2 checkBool (private)
+
+Used to validate flag inputs.  1 and 'true' are accepted as positive inputs. 0 and 'false' for negative inputs.
+
+=cut
+
+sub checkBool {
+  my $self = shift;
+  my $val = shift;
+
+  if ($val !~ /^1|true|0|false$/) { confess "value ($val) is a flag which must be set to 0, 1, 'true', or 'false'"; }
+  if ($val eq 'false') { $val = 0; }
+  elsif ($val eq 'true') { $val = 1; }
+  
+  return $val;
+}
+    
 =head2 htmlAddDataSetup (private)
 
-used outside the table to create a <div> for the insertion of new table rows with javascript
+Used outside the table to create a <div> for the insertion of new table rows with javascript
 
 =cut
 

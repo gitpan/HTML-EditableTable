@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# EditableTable Example 3
+# EditableTable Example 9 - test case for multiple tables in same cgi
 # demonstrates the Horizontal table
 
 use strict;
@@ -53,6 +53,8 @@ my @tableData =
      },
     );
 
+my @tableData2 = @tableData;
+
 my @tableFields =
     (
      {
@@ -70,7 +72,7 @@ my @tableFields =
        'formElement' => 'textfield',
        'size' => 15,
        'uniquifierField' => 'part_id',
-       'tooltip' => '2010 Catalog Number',
+       'tooltip' => '2010 Catalog Id',
      },
      {
        'dbfield' => 'addition_date',
@@ -148,6 +150,8 @@ my @tableFields =
      },     
     );
 
+my @tableFields2 = @tableFields;
+
 ######## CGI Controller ##########
 
 our $t = CGI->new();
@@ -183,7 +187,28 @@ my $table = HTML::EditableTable::Horizontal->new
 
 print "<form method=post>";
 
+print "<h2>Table 1</h2>";
 $table->htmlDisplay();
+
+$tabIndex  = 500;
+
+my $table2 = HTML::EditableTable::Horizontal->new
+    (
+     {
+       'tableFields' => \@tableFields2,
+       'width' => '100%',
+       'jsAddData' => 1,
+       'editMode' => $context,
+       'data' => \@tableData2,
+       'tabindex' => \$tabIndex,
+       'style' => "border-width:5px;",
+       'sortHeader' => "example_9.cgi?context=$context&",
+       'sortData' => 1,       
+     }
+    );
+
+print "<h2>Table 2</h2>";
+$table2->htmlDisplay();
 
 my $nextContext = $context eq 'view' ? 'edit' : 'view';
 
